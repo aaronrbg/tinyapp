@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+    <%- include('partials/_header') %>
+    <h2>URLs:</h2>
+    <ul>
+    <% for(let url in urls){ %>
+      <li><%= `${urls[url]} ==>  ${url}`%></li>
+    <% } %>
+    </ul>
+    </br>
+    <h3><a href='#'>Shorten a New URL</a></h3>
+</body>
+</html>
