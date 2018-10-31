@@ -8,10 +8,10 @@
     <h2>URLs:</h2>
     <ul>
     <% for(let url in urls){ %>
-      <li><%= `${urls[url]} ==>  ${url}`%></li>
+      <li><%= `${url}`%> &#160; &#160; &#160; &#160; <a href="<%= urls[url] %>"><%= urls[url] %></a></li>
     <% } %>
     </ul>
     </br>
-    <h3><a href='#'>Shorten a New URL</a></h3>
+    <h3>&#160; &#160; &#160; &#160;<a href='/urls/new'>mini-fry a new yew</a></h3>
 </body>
 </html>

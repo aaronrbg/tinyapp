@@ -15,10 +15,9 @@ function generateRandomString(x) {
     //comment by tbanik
     return [...Array(x)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
     //limitations are that there is a chance a string could be selected twice
-    //a different approach to avaoid this could be to create an incrimenting string which checks the last vlue created in the url database
+    //a different approach to avaoid this could be to create an incrimenting 
+    //string which checks the last vlue created in the url database
 }
-
-console.log(generateRandomString(6));
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
