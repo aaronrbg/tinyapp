@@ -26,7 +26,7 @@ const urlDatabase = {
 
 // home 
 app.get('/', function(req, res) {
-    res.render('urls_index');
+    res.redirect('/urls');
 });
 
 // url list page 
@@ -43,11 +43,11 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
     let templateVars = { shortURL: req.params.id, urls: urlDatabase};
     res.render("urls_show", templateVars);
-    console.log(req.params.id)
   });
 
 app.get("/u/:shortURL", (req, res) => {
     let longURL = urlDatabase[req.params.shortURL];
+    console.log(longURL)
     if (longURL === undefined) {
     res.redirect('/urls');
     } else {
@@ -59,11 +59,10 @@ app.post("/urls", (req, res) => {
     let longURL = req.body //
     let shortURL = generateRandomString(6);
     urlDatabase[shortURL] = longURL.longURL;
-    console.log(urlDatabase);
     res.redirect(`http://localhost:8080/urls/${shortURL}`);
   });
 
 
 app.listen(PORT, () => {
-  console.log(`We're listening on port ${PORT}!`);
+  console.log(`We're live on port ${PORT}!`);
 });
