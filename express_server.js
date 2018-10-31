@@ -46,26 +46,23 @@ app.get("/urls/:id", (req, res) => {
   });
 
 app.get("/u/:shortURL", (req, res) => {
+    console.log(req.params.shortURL)
+    console.log(urlDatabase[req.params.shortURL])
     let longURL = urlDatabase[req.params.shortURL];
-    console.log(longURL)
-    if (longURL === undefined) {
-    res.redirect('/urls');
-    } else {
     res.redirect(longURL);
-    }
   });
-
-app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.newURL;
-  res.redirect('/urls');
-});
 
 app.post("/urls/new", (req, res) => {
     let longURL = req.body //
     let shortURL = generateRandomString(6);
     urlDatabase[shortURL] = longURL.longURL;
-    res.redirect(`http://localhost:8080/urls/${shortURL}`);
-  });
+    res.redirect(`http://localhost:8080/urls`);
+});
+
+app.post("/urls/:shortURL", (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body.newURL;
+  res.redirect('/urls');
+});
 
 app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[req.params.id];
