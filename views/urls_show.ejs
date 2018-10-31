@@ -4,6 +4,10 @@
   <title>TinyApp</title>
 </head>
 <body>
-    <h2>TEST</h2>
+    <% for(let url in urls){ %>
+        <% if(url === shortURL){ %>
+            <%= `${urls[url]} ==> ${url}`%>
+        <% } %>
+    <% } %>
 </body>
 </html>

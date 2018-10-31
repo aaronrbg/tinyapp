@@ -10,6 +10,16 @@ app.set('view engine', 'ejs');
 //set the port to use for localhost
 const PORT = 8080; // default port 8080
 
+function generateRandomString(x) {
+    //http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+    //comment by tbanik
+    return [...Array(x)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
+    //limitations are that there is a chance a string could be selected twice
+    //a different approach to avaoid this could be to create an incrimenting string which checks the last vlue created in the url database
+}
+
+console.log(generateRandomString(6));
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
@@ -30,15 +40,24 @@ app.get("/urls/new", (req, res) => {
     res.render("urls_new");
   });
 
-// url list page 
-app.get('/urls/:id', function(req, res) {
-    let templateVars = { shortURL: req.params.id, longURL: urlDatabase[req.params.id] };
-    res.render('urls_show', templateVars);
-});
+// single url page 
+app.get("/urls/:id", (req, res) => {
+    let templateVars = { shortURL: req.params.id, urls: urlDatabase};
+    res.render("urls_show", templateVars);
+    console.log(req.params.id)
+  });
+
+app.get("/u/:shortURL", (req, res) => {
+    let longURL = urlDatabase[shortURL];
+    res.redirect(longURL);
+  });
 
 app.post("/urls", (req, res) => {
-    console.log(req.body);  // debug statement to see POST parameters
-    res.send("Ok");         // Respond with 'Ok' (we will replace this)
+    let longURL = req.body //
+    let shortURL = generateRandomString(6);
+    urlDatabase[shortURL] = longURL.longURL;
+    console.log(urlDatabase);
+    res.redirect(`http://localhost:8080/urls/${shortURL}`);
   });
 
 
