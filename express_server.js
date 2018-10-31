@@ -33,7 +33,10 @@ app.get('/', function(req, res) {
 
 // url list page 
 app.get('/urls', function(req, res) {
-    let templateVars = { urls: urlDatabase };
+    let templateVars = { 
+      urls: urlDatabase,
+      username: req.cookies["username"], 
+    };
     res.render('urls_index', templateVars);
 });
 
@@ -43,7 +46,11 @@ app.get("/urls/new", (req, res) => {
 
 // single url page 
 app.get("/urls/:id", (req, res) => {
-    let templateVars = { shortURL: req.params.id, urls: urlDatabase};
+    let templateVars = { 
+      shortURL: req.params.id, 
+      urls: urlDatabase,
+      username: req.cookies["username"],
+    };
     res.render("urls_show", templateVars);
   });
 
