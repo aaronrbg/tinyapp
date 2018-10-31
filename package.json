@@ -14,3 +14,7 @@
     "express": "^4.16.4"
   }
 }
+"scripts": {
+  "start": "nodemon -L express_server.js",
+  "test": "echo \"Error: no test specified\" && exit 1"
+}

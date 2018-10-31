@@ -55,12 +55,22 @@ app.get("/u/:shortURL", (req, res) => {
     }
   });
 
-app.post("/urls", (req, res) => {
+app.post("/urls/:shortURL", (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body.newURL;
+  res.redirect('/urls');
+});
+
+app.post("/urls/new", (req, res) => {
     let longURL = req.body //
     let shortURL = generateRandomString(6);
     urlDatabase[shortURL] = longURL.longURL;
     res.redirect(`http://localhost:8080/urls/${shortURL}`);
   });
+
+app.post("/urls/:id/delete", (req, res) => {
+    delete urlDatabase[req.params.id];
+    res.redirect('/urls');
+})
 
 
 app.listen(PORT, () => {

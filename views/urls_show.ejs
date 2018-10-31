@@ -6,7 +6,11 @@
 <body>
     <% for(let url in urls){ %>
         <% if(url === shortURL){ %>
-            <h3><a href='<%= `${urls[url]}`%>'><%=`${urls[url]}`%></a><%=` can now be accessed at `%><a href="http://localhost:8080/u/<%=`${url}`%>"><%=`http://localhost:8080/u/${url}`%></a></h3>
+            <h1><%=`${url}`%></h1>
+            <form method="POST" action=<%=`/urls/${shortURL}`%>>
+                <input type="text" id="newURL" name="newURL" placeholder="update url..."value="" /><br />
+                <button type="submit">Update</button>
+            </form>
         <% } %>
     <% } %>
 </body>

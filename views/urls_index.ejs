@@ -8,7 +8,7 @@
     <h2>URLs:</h2>
     <ul>
     <% for(let url in urls){ %>
-      <li><%= `${url}`%> &#160; &#160; &#160; &#160; <a href="<%= urls[url] %>"><%= urls[url] %></a></li>
+      <li><p><%= `${url}`%> &#160; &#160; &#160;<%= urls[url] %><form method="POST" action="/urls/<%=`${url}`%>/delete"><button>Delete</button></form><a href="/urls/<%=[url]%>"><button>Edit</button></a></p></li>
     <% } %>
     </ul>
     </br>
