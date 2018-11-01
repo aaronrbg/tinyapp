@@ -104,13 +104,19 @@ app.get("/urls/new", (req, res) => {
 
 // single url page 
 app.get("/urls/:id", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    res.send('please log in to edit your links');
+  } else if (req.cookies["user_id"].id !== urlDatabase[req.params.id].creator) {
+    res.send('this link does not belong to you');
+  } else {
     let templateVars = { 
       shortURL: req.params.id, 
       urls: urlsForUser(req.cookies["user_id"]),
       user: req.cookies["user_id"],
     };
     res.render("urls_show", templateVars);
-  });
+  }
+});
 
 app.get("/u/:shortURL", (req, res) => {
     let longURL = urlDatabase[req.params.shortURL].longURL;
@@ -174,12 +180,10 @@ app.post("/urls/new", (req, res) => {
       'creator': user,
       'longURL': longURL
     }
-    console.log(urlDatabase[shortURL]);
     res.redirect(`/urls`);
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  
   urlDatabase[req.params.shortURL].longURL = req.body.newURL;
   res.redirect('/urls');
 });
