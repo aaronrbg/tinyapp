@@ -36,6 +36,11 @@ const users = {
     id: "user2RandomID", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
+  },
+  "user3RandomID": {
+    id: "user3RandomID", 
+    email: "a@a", 
+    password: "a"
   }
 }
 
@@ -46,22 +51,32 @@ app.get('/', function(req, res) {
 
 app.get('/register', function(req, res) {
   let templateVars = {
-    username: req.cookies["username"]
+    user: req.cookies["user_id"]
   }
   res.render('register', templateVars);
+});
+
+app.get('/login', function(req, res) {
+  let templateVars = {
+    user: req.cookies["user_id"]
+  }
+  res.render('login', templateVars);
 });
 
 // url list page 
 app.get('/urls', function(req, res) {
     let templateVars = { 
       urls: urlDatabase,
-      username: req.cookies["username"], 
+      user: req.cookies["user_id"], 
     };
     res.render('urls_index', templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-    res.render("urls_new");
+    let templateVars = {
+      user: req.cookies["user_id"]
+    }
+    res.render("urls_new", templateVars);
   });
 
 // single url page 
@@ -69,7 +84,7 @@ app.get("/urls/:id", (req, res) => {
     let templateVars = { 
       shortURL: req.params.id, 
       urls: urlDatabase,
-      username: req.cookies["username"],
+      user: req.cookies["user_id"],
     };
     res.render("urls_show", templateVars);
   });
@@ -82,24 +97,51 @@ app.get("/u/:shortURL", (req, res) => {
   });
 
 app.post("/register", (req, res) => {
+    if (!req.body.email || !req.body.password) {
+      res.statusCode = 400;
+      res.send('No email or password entered');
+      return;
+    }
+    for(let account in users){
+      if (users[account].email === req.body.email) {
+      res.statusCode = 400;
+      res.send('That account already exists');
+      return;
+      }
+    }
     let userID = generateRandomString(8)
     users[userID] = {
       id: userID,
       email: req.body.email,
       password: req.body.password,
     }
-    res.cookie('user_id', userID);
-    console.log(users);
+    res.cookie('user_id', users[userID]);
     res.redirect('/urls');
   });
 
 app.post("/login", (req, res) => {
-    res.cookie('username', req.body.username);
+    if (!req.body.email || !req.body.password) {
+      res.statusCode = 400;
+      res.send('No email or password entered');
+      return;
+    }
+    for(let userID in users){
+      let username = users[userID].email;
+      let password = users[userID].password;
+      if (username === req.body.email && password ===req.body.password) {
+        res.cookie('user_id', users[userID]);
+        res.redirect('/urls?login_success')
+        return;
+      }
+    }
+    //if username and pswerd were entered but username isnt found, tell user
+    res.statusCode = 403;
+    res.send('Wrong username or password');
     res.redirect('/urls');
   });
-
+  
 app.post("/logout", (req, res) => {
-    res.clearCookie('username');
+    res.clearCookie('user_id');
     res.redirect('/urls');
 })
 
