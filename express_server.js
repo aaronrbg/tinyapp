@@ -23,24 +23,42 @@ function generateRandomString(x) {
 
 //create databases with default values
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
+  'b2xVn2': {
+    'creator': 'a',
+    "longURL": "http://www.lighthouselabs.ca"
+  },
+  "9sm5xK": {
+    'creator': 'a',
+    "longURL": "http://www.google.com"
+  }
+}
 const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
+  "1": {
+    id: "1", 
     email: "user@example.com", 
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
+ "2": {
+    id: "2", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
   },
-  "user3RandomID": {
-    id: "user3RandomID", 
+  "a": {
+    id: "a", 
     email: "a@a", 
     password: "a"
+  }
+}
+
+function urlsForUser(userID) {
+  let userURLdatabase = {};
+  if (userID) {
+    for (let urlID in urlDatabase) {
+      if (urlDatabase[urlID].creator === userID.id) {
+        userURLdatabase[urlID] = urlDatabase[urlID].longURL;
+      }
+    }
+    return userURLdatabase;
   }
 }
 
@@ -66,9 +84,10 @@ app.get('/login', function(req, res) {
 // url list page 
 app.get('/urls', function(req, res) {
     let templateVars = { 
-      urls: urlDatabase,
+      urls: urlsForUser(req.cookies["user_id"]),
       user: req.cookies["user_id"], 
     };
+
     res.render('urls_index', templateVars);
 });
 
@@ -79,7 +98,7 @@ app.get("/urls/new", (req, res) => {
     if (req.cookies["user_id"]) {
       res.render("urls_new", templateVars);
     } else {
-      res.redirect('/urls');
+      res.send('please log in to create new links');
     }
   });
 
@@ -94,9 +113,7 @@ app.get("/urls/:id", (req, res) => {
   });
 
 app.get("/u/:shortURL", (req, res) => {
-    console.log(req.params.shortURL)
-    console.log(urlDatabase[req.params.shortURL])
-    let longURL = urlDatabase[req.params.shortURL];
+    let longURL = urlDatabase[req.params.shortURL].longurl;
     res.redirect(longURL);
   });
 
@@ -150,14 +167,14 @@ app.post("/logout", (req, res) => {
 })
 
 app.post("/urls/new", (req, res) => {
-    let longURL = req.body //
+    let longURL = req.body.longURL //
     let shortURL = generateRandomString(6);
-    urlDatabase[shortURL] = longURL.longURL;
-    res.redirect(`http://localhost:8080/urls`);
+    urlDatabase[shortURL].longurl = longURL;
+    res.redirect(`/urls`);
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.newURL;
+  urlDatabase[req.params.shortURL].longurl = req.body.newURL;
   res.redirect('/urls');
 });
 
