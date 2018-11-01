@@ -5,9 +5,6 @@
             <input type="submit" name="logout" value="Logout">
           </form>
         <% } else { %>
-        <form action="/login" method="POST">
-            <label for="username">Enter your username</label>
-            <input type="text" name="username" id="username" style="width: 100px">
-            <input type="submit" value="Submit">
-        </form>
+        <form action="/register" method="GET"><input type="submit" value="Register"></input></form>
+        
     <% } %>

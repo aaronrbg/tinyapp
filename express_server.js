@@ -21,14 +21,34 @@ function generateRandomString(x) {
     //string which checks the last vlue created in the url database
 }
 
+//create databases with default values
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+const users = { 
+  "userRandomID": {
+    id: "userRandomID", 
+    email: "user@example.com", 
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID", 
+    email: "user2@example.com", 
+    password: "dishwasher-funk"
+  }
+}
 
 // home 
 app.get('/', function(req, res) {
     res.redirect('/urls');
+});
+
+app.get('/register', function(req, res) {
+  let templateVars = {
+    username: req.cookies["username"]
+  }
+  res.render('register', templateVars);
 });
 
 // url list page 
@@ -59,6 +79,18 @@ app.get("/u/:shortURL", (req, res) => {
     console.log(urlDatabase[req.params.shortURL])
     let longURL = urlDatabase[req.params.shortURL];
     res.redirect(longURL);
+  });
+
+app.post("/register", (req, res) => {
+    let userID = generateRandomString(8)
+    users[userID] = {
+      id: userID,
+      email: req.body.email,
+      password: req.body.password,
+    }
+    res.cookie('user_id', userID);
+    console.log(users);
+    res.redirect('/urls');
   });
 
 app.post("/login", (req, res) => {
