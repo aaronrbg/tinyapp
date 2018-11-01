@@ -3,6 +3,7 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
@@ -36,7 +37,7 @@ const users = {
   "1": {
     id: "1", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    hashedPassword: bcrypt.hashSync("purple-monkey-dinosaur", 10)
   },
  "2": {
     id: "2", 
@@ -137,10 +138,11 @@ app.post("/register", (req, res) => {
       }
     }
     let userID = generateRandomString(8)
+    let password = req.body.password;
     users[userID] = {
       id: userID,
       email: req.body.email,
-      password: req.body.password,
+      hashedPassword: bcrypt.hashSync(password, 10)
     }
     res.cookie('user_id', users[userID]);
     res.redirect('/urls');
@@ -154,8 +156,8 @@ app.post("/login", (req, res) => {
     }
     for(let userID in users){
       let username = users[userID].email;
-      let password = users[userID].password;
-      if (username === req.body.email && password ===req.body.password) {
+      let hashedPassword = users[userID].hashedPassword;
+      if (username === req.body.email && bcrypt.compareSync(req.body.password, hashedPassword)) {
         res.cookie('user_id', users[userID]);
         res.redirect('/urls?login_success')
         return;
