@@ -167,9 +167,14 @@ app.post("/logout", (req, res) => {
 })
 
 app.post("/urls/new", (req, res) => {
-    let longURL = req.body.longURL //
+    let longURL = req.body.longURL;
     let shortURL = generateRandomString(6);
-    urlDatabase[shortURL].longurl = longURL;
+    let user = req.cookies["user_id"].id;
+    urlDatabase[shortURL] = {
+      'creator': user,
+      'longURL': longURL
+    }
+    console.log(urlDatabase[shortURL]);
     res.redirect(`/urls`);
 });
 
