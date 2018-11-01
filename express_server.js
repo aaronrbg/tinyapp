@@ -106,14 +106,14 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:id", (req, res) => {
     let templateVars = { 
       shortURL: req.params.id, 
-      urls: urlDatabase,
+      urls: urlsForUser(req.cookies["user_id"]),
       user: req.cookies["user_id"],
     };
     res.render("urls_show", templateVars);
   });
 
 app.get("/u/:shortURL", (req, res) => {
-    let longURL = urlDatabase[req.params.shortURL].longurl;
+    let longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
   });
 
@@ -179,7 +179,8 @@ app.post("/urls/new", (req, res) => {
 });
 
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL].longurl = req.body.newURL;
+  
+  urlDatabase[req.params.shortURL].longURL = req.body.newURL;
   res.redirect('/urls');
 });
 
