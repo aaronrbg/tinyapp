@@ -77,14 +77,14 @@ app.get('/', function(req, res) {
 
 app.get('/register', function(req, res) {
   let templateVars = {
-    user: req.session.user_id
+    user: req.session.user_i
   }
   res.render('register', templateVars);
 });
 
 app.get('/login', function(req, res) {
   let templateVars = {
-    user: req.session.user_id
+    user: req.session.user_i
   }
   res.render('login', templateVars);
 });
@@ -93,9 +93,9 @@ app.get('/login', function(req, res) {
 app.get('/urls', function(req, res) {
     let templateVars = { 
       urls: urlsForUser(req.session.user_id),
-      user: req.session.user_id, 
+      user: req.session.user_id
     };
-
+    console.log(req.session.user_id);
     res.render('urls_index', templateVars);
 });
 
@@ -120,7 +120,7 @@ app.get("/urls/:id", (req, res) => {
     let templateVars = { 
       shortURL: req.params.id, 
       urls: urlsForUser(req.session.user_id),
-      user: req.session.user_id,
+      user: req.session.user_id
     };
     res.render("urls_show", templateVars);
   }
