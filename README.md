@@ -4,7 +4,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!["Home page when not logged in"](#https://github.com/aaronrbg/tinyapp/blob/master/docs/1homePageNoLogin.png?raw=true)
+!["Home page when not logged in"](https://github.com/aaronrbg/tinyapp/blob/master/docs/1homePageNoLogin.png?raw=true)
 
 !["Registration page"](#https://github.com/aaronrbg/tinyapp/blob/master/docs/2register.png?raw=true)
 
