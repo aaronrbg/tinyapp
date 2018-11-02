@@ -1,3 +1,6 @@
+// set the port to use for localhost
+const PORT = 8080; // default port 8080
+
 // load the things we need
 const express = require('express');
 
@@ -34,9 +37,6 @@ function urlsForUser(userID) {
     return userurl_db;
   }
 }
-
-// set the port to use for localhost
-const PORT = 8080; // default port 8080
 
 // create init databases with some default values
 const url_db = { ea29ps: { creator: '1p5whfmt', longURL: 'http://festivalworlds.com' } };
@@ -145,8 +145,6 @@ app.post('/urls/new', (req, res) => {
     creator: user,
     longURL: longURL,
   };
-  console.log(users);
-  console.log(url_db);
   res.redirect('/urls');
 });
 
