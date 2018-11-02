@@ -6,17 +6,17 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 !["Home page when not logged in"](https://github.com/aaronrbg/tinyapp/blob/master/docs/1homePageNoLogin.png?raw=true)
 
-!["Registration page"](#https://github.com/aaronrbg/tinyapp/blob/master/docs/2register.png?raw=true)
+!["Registration page"](https://github.com/aaronrbg/tinyapp/blob/master/docs/2register.png?raw=true)
 
-!["Home page when logged in (registered) without links"](#https://github.com/aaronrbg/tinyapp/blob/master/docs/3homePageLoggedInNoLinks.png?raw=true)
+!["Home page when logged in (registered) without links"](https://github.com/aaronrbg/tinyapp/blob/master/docs/3homePageLoggedInNoLinks.png?raw=true)
 )
-!["Create a new link](#https://github.com/aaronrbg/tinyapp/blob/master/docs/4newUrl.png?raw=true)
+!["Create a new link](https://github.com/aaronrbg/tinyapp/blob/master/docs/4newUrl.png?raw=true)
 )
-!["Home page with a link"](#https://github.com/aaronrbg/tinyapp/blob/master/docs/5homePageLoggedInLinks.png?raw=true)
+!["Home page with a link"](https://github.com/aaronrbg/tinyapp/blob/master/docs/5homePageLoggedInLinks.png?raw=true)
 
-!["Editing a link"](#https://github.com/aaronrbg/tinyapp/blob/master/docs/6editLink.png?raw=true)
+!["Editing a link"](https://github.com/aaronrbg/tinyapp/blob/master/docs/6editLink.png?raw=true)
 
-!["Home page with multiple links"](#https://github.com/aaronrbg/tinyapp/blob/master/docs/7homePageLoggedInLinks2.png?raw=true)
+!["Home page with multiple links"](https://github.com/aaronrbg/tinyapp/blob/master/docs/7homePageLoggedInLinks2.png?raw=true)
 
 
 ## Dependencies
