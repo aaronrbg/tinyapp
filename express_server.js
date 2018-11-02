@@ -7,54 +7,41 @@ const cookieSession = require('cookie-session')
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
-  //keys: process.env.COOKIE_SESSION_KEYS,
+  //keys: process.env.COOKIE_SESSION_KEYS <- requires .env file. othwerwise use 'supersecret' below
   secret: 'supersecret',
-  // Cookie Options
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
+//random generator for creating unique ids
+//source: http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript //comment by tbanik
+function generateRandomString(x) {
+    return [...Array(x)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
+}
+
+//helper function to serve a filtered database according to what user is logged in
+function urlsForUser(userID) {
+  let userurl_db = {};
+  if (userID) {
+    for (let urlID in url_db) {
+      if (url_db[urlID].creator === userID.id) {
+        userurl_db[urlID] = url_db[urlID].longURL;
+      }
+    }
+    return userurl_db;
+  }
+}
+
 //set the port to use for localhost
 const PORT = 8080; // default port 8080
 
-function generateRandomString(x) {
-    //http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
-    //comment by tbanik
-    return [...Array(x)].map(i=>(~~(Math.random()*36)).toString(36)).join('');
-    //limitations are that there is a chance a string could be selected twice
-    //a different approach to avaoid this could be to create an incrimenting 
-    //string which checks the last vlue created in the url database
-}
-
-//create databases with default values
-const urlDatabase = {
-  'b2xVn2': {
-    'creator': 'a',
-    "longURL": "http://www.lighthouselabs.ca"
-  },
-  "9sm5xK": {
-    'creator': 'a',
-    "longURL": "http://www.google.com"
-  }
-}
+//create empty 'mock' databases
+const url_db = {}
 const users = {}
 
-function urlsForUser(userID) {
-  let userURLdatabase = {};
-  if (userID) {
-    for (let urlID in urlDatabase) {
-      if (urlDatabase[urlID].creator === userID.id) {
-        userURLdatabase[urlID] = urlDatabase[urlID].longURL;
-      }
-    }
-    return userURLdatabase;
-  }
-}
-
-// home 
-app.get('/', function(req, res) {
+//home route 
+app.get('/', (req, res) => {
     if (req.session.user_id) {
       res.redirect('/urls');
     } else {
@@ -62,29 +49,81 @@ app.get('/', function(req, res) {
     }
 });
 
-app.get('/register', function(req, res) {
+//login page | home redirect when no user is logged in 
+app.get('/login', (req, res) => {
   let templateVars = {
-    user: req.session.user_i
-  }
-  res.render('register', templateVars);
-});
-
-app.get('/login', function(req, res) {
-  let templateVars = {
-    user: req.session.user_i
+    user: req.session.user_id
   }
   res.render('login', templateVars);
 });
+app.post("/login", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    res.statusCode = 400;
+    res.send('No email or password entered');
+    return;
+  }
+  for(let userID in users){
+    let username = users[userID].email;
+    let hashedPassword = users[userID].hashedPassword;
+    if (username === req.body.email && bcrypt.compareSync(req.body.password, hashedPassword)) {
+      req.session.user_id = users[userID];
+      res.redirect('/urls?login_success')
+      return;
+    }
+  }
+  //if username and passworrd were entered but username isnt found, tell user
+  res.statusCode = 403;
+  res.send('Wrong username or password');
+  res.redirect('/urls');
+});
 
-// url list page 
-app.get('/urls', function(req, res) {
-    let templateVars = { 
+//urls list page | home redirect when user is logged in
+app.get('/urls', (req, res) => {
+    let templateVars = {
+      //calls helper function to serve filtered db
       urls: urlsForUser(req.session.user_id),
       user: req.session.user_id
     };
     res.render('urls_index', templateVars);
 });
 
+//register a new user
+app.get('/register', (req, res) => {
+  let templateVars = {
+    user: req.session.user_id
+  }
+  res.render('register', templateVars);
+});
+app.post("/register", (req, res) => {
+  //catches missing password or email
+  if (!req.body.email || !req.body.password) {
+    res.statusCode = 400;
+    res.send('No email or password entered');
+    return;
+  }
+  //catches already existing user (email)
+  for(let account in users){
+    if (users[account].email === req.body.email) {
+    res.statusCode = 400;
+    res.send('That account already exists');
+    return;
+    }
+  }
+  //geneartes user ID and grabs password
+  let userID = generateRandomString(8);
+  let password = req.body.password;
+  //creates new user object
+  users[userID] = {
+    id: userID,
+    email: req.body.email,
+    hashedPassword: bcrypt.hashSync(password, 10)
+  }
+  //logs in user automatically after registration
+  req.session.user_id = users[userID];
+  res.redirect('/urls');
+});
+
+//create new url link page. only available to 
 app.get("/urls/new", (req, res) => {
     let templateVars = {
       user: req.session.user_id
@@ -92,15 +131,28 @@ app.get("/urls/new", (req, res) => {
     if (req.session.user_id) {
       res.render("urls_new", templateVars);
     } else {
-      res.redirect('/login')
+      res.statusCode = 403;
+      res.redirect('/login?from%new');
     }
   });
+app.post("/urls/new", (req, res) => {
+  let longURL = req.body.longURL;
+  let shortURL = generateRandomString(6);
+  let user = req.session.user_id.id;
+  url_db[shortURL] = {
+    'creator': user,
+    'longURL': longURL
+  }
+  res.redirect(`/urls`);
+});
 
-// single url page 
+//single url edit page
 app.get("/urls/:id", (req, res) => {
   if (!req.session.user_id) {
+    res.statusCode = 403;
     res.send('please log in to edit your links');
-  } else if (req.session.user_id.id !== urlDatabase[req.params.id].creator) {
+  } else if (req.session.user_id.id !== url_db[req.params.id].creator) {
+    res.statusCode = 403;
     res.send('this link does not belong to you');
   } else {
     let templateVars = { 
@@ -111,82 +163,34 @@ app.get("/urls/:id", (req, res) => {
     res.render("urls_show", templateVars);
   }
 });
-
-app.get("/u/:shortURL", (req, res) => {
-    let longURL = urlDatabase[req.params.shortURL].longURL;
-    res.redirect(longURL);
-  });
-
-app.post("/register", (req, res) => {
-    if (!req.body.email || !req.body.password) {
-      res.statusCode = 400;
-      res.send('No email or password entered');
-      return;
-    }
-    for(let account in users){
-      if (users[account].email === req.body.email) {
-      res.statusCode = 400;
-      res.send('That account already exists');
-      return;
-      }
-    }
-    let userID = generateRandomString(8)
-    let password = req.body.password;
-    users[userID] = {
-      id: userID,
-      email: req.body.email,
-      hashedPassword: bcrypt.hashSync(password, 10)
-    }
-    req.session.user_id = users[userID];
-    res.redirect('/urls');
-  });
-
-app.post("/login", (req, res) => {
-    if (!req.body.email || !req.body.password) {
-      res.statusCode = 400;
-      res.send('No email or password entered');
-      return;
-    }
-    for(let userID in users){
-      let username = users[userID].email;
-      let hashedPassword = users[userID].hashedPassword;
-      if (username === req.body.email && bcrypt.compareSync(req.body.password, hashedPassword)) {
-        req.session.user_id = users[userID];
-        res.redirect('/urls?login_success')
-        return;
-      }
-    }
-    //if username and pswerd were entered but username isnt found, tell user
-    res.statusCode = 403;
-    res.send('Wrong username or password');
-    res.redirect('/urls');
-  });
-  
-app.post("/logout", (req, res) => {
-    req.session = null;
-    res.redirect('/urls');
-})
-
-app.post("/urls/new", (req, res) => {
-    let longURL = req.body.longURL;
-    let shortURL = generateRandomString(6);
-    let user = req.session.user_id.id;
-    urlDatabase[shortURL] = {
-      'creator': user,
-      'longURL': longURL
-    }
-    res.redirect(`/urls`);
-});
-
-app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL].longURL = req.body.newURL;
+app.post("/urls/:id", (req, res) => {
+  url_db[req.params.id].longURL = req.body.newURL;
   res.redirect('/urls');
 });
 
+//logs out the user (clears cookie)
+app.post("/logout", (req, res) => {
+  req.session = null;
+  res.redirect('/urls');
+});
+
+//redirects a short url to its real url
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = url_db[req.params.shortURL].longURL;
+  res.redirect(longURL);
+});
+
+//deletes a url entry in db
 app.post("/urls/:id/delete", (req, res) => {
-    delete urlDatabase[req.params.id];
+    delete url_db[req.params.id];
     res.redirect('/urls');
-})
+});
+
+//catch all for bad url
+app.get("*", (req, res) => {
+  res.statusCode = 404;
+  res.send('Page not found')
+});
 
 app.listen(PORT, () => {
   console.log(`We're live on port ${PORT}!`);
