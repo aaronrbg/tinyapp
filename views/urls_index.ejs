@@ -5,13 +5,17 @@
 </head>
 <body>
     <%- include('partials/_header') %>
-    <h2>URLs:</h2>
-    <ul>
-    <% for(let url in urls){ %>
-      <li><p><a href="<%=`/u/${url}`%>"><%= `${url}`%></a> &#160; &#160; &#160;<%= urls[url] %><form method="POST" action="/urls/<%=`${url}`%>/delete"><button>Delete</button></form><a href="/urls/<%=[url]%>"><button>Edit</button></a></p></li>
+    <% if (user) {%>
+      <h2>URLs:</h2>
+      <ul>
+      <% for(let url in urls){ %>
+        <li><p><a href="<%=`/u/${url}`%>"><%= `${url}`%></a> &#160; &#160; &#160;<%= urls[url] %><form method="POST" action="/urls/<%=`${url}`%>/delete"><button>Delete</button></form><a href="/urls/<%=[url]%>"><button>Edit</button></a></p></li>
+      <% } %>
+      </ul>
+      </br>
+      <h3>&#160; &#160; &#160; &#160;<a href='/urls/new'>mini-fry a new yew arr el</a></h3>
+    <% } else { %>
+      <h2>Please <a href='/logn'>log in</a> to view short URLS</h2>
     <% } %>
-    </ul>
-    </br>
-    <h3>&#160; &#160; &#160; &#160;<a href='/urls/new'>mini-fry a new yew arr el</a></h3>
 </body>
 </html>

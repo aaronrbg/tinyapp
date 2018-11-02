@@ -4,11 +4,12 @@
   <title>TinyApp</title>
 </head>
 <body>
+    <% include partials/_header %>
     <% for(let url in urls){ %>
         <% if(url === shortURL){ %>
             <h1><%=`${url}`%></h1>
             <form method="POST" action=<%=`/urls/${shortURL}`%>>
-                <input type="text" id="newURL" name="newURL" placeholder="update url..."value="" /><br />
+                <input type="text" id="newURL" name="newURL" placeholder= "<%=urls[url]%>" value="" /><br />
                 <button type="submit">Update</button>
             </form>
         <% } %>

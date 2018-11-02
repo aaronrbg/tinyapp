@@ -40,23 +40,7 @@ const urlDatabase = {
     "longURL": "http://www.google.com"
   }
 }
-const users = { 
-  "1": {
-    id: "1", 
-    email: "user@example.com", 
-    hashedPassword: bcrypt.hashSync("purple-monkey-dinosaur", 10)
-  },
- "2": {
-    id: "2", 
-    email: "user2@example.com", 
-    password: bcrypt.hashSync("dishwasher-funk", 10)
-  },
-  "a": {
-    id: "a", 
-    email: "a@a",
-    password: bcrypt.hashSync('a', 10)
-  }
-}
+const users = {}
 
 function urlsForUser(userID) {
   let userURLdatabase = {};
@@ -72,7 +56,11 @@ function urlsForUser(userID) {
 
 // home 
 app.get('/', function(req, res) {
-    res.redirect('/urls');
+    if (req.session.user_id) {
+      res.redirect('/urls');
+    } else {
+      res.redirect('/login');
+    }
 });
 
 app.get('/register', function(req, res) {
@@ -95,7 +83,6 @@ app.get('/urls', function(req, res) {
       urls: urlsForUser(req.session.user_id),
       user: req.session.user_id
     };
-    console.log(req.session.user_id);
     res.render('urls_index', templateVars);
 });
 
@@ -106,7 +93,7 @@ app.get("/urls/new", (req, res) => {
     if (req.session.user_id) {
       res.render("urls_new", templateVars);
     } else {
-      res.send('please log in to create new links');
+      res.redirect('/login')
     }
   });
 
@@ -177,7 +164,7 @@ app.post("/login", (req, res) => {
   });
   
 app.post("/logout", (req, res) => {
-    res.clearCookie('user_id');
+    req.session = null;
     res.redirect('/urls');
 })
 
