@@ -163,6 +163,7 @@ app.get('/urls/:id', (req, res) => {
     const templateVars = {
       shortURL: req.params.id,
       urls: urlsForUser(req.session.user_id),
+      url_db,
       user: req.session.user_id,
     };
     res.render('urls_show', templateVars);
