@@ -7,8 +7,8 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-const cookieSession = require('cookie-session')
-;
+const cookieSession = require('cookie-session');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
@@ -39,7 +39,7 @@ function urlsForUser(userID) {
 }
 
 // create init databases with some default values
-const url_db = { ea29ps: { creator: '1p5whfmt', longURL: 'http://festivalworlds.com' } };
+const url_db = { ea29ps: { creator: '1p5whfmt', longURL: 'http://festivalworlds.com', accessLog: ['me, once'] } };
 const users = { '1p5whfmt': { id: '1p5whfmt', email: 'a@a', hashedPassword: /* 'a' */ '$2b$10$fmZojVzHnrdMlMwdhSP7uOKd/kYllv9G3xxzqH.Iym8QZpi14BKvK' } };
 
 // home route
@@ -83,6 +83,7 @@ app.post('/login', (req, res) => {
 app.get('/urls', (req, res) => {
   const templateVars = {
     // calls helper function to serve filtered db
+    url_db,
     urls: urlsForUser(req.session.user_id),
     user: req.session.user_id,
   };
@@ -144,6 +145,8 @@ app.post('/urls/new', (req, res) => {
   url_db[shortURL] = {
     creator: user,
     longURL: longURL,
+    timeCreated: date.getTime(),
+    accessLog: [],
   };
   res.redirect('/urls');
 });
@@ -178,7 +181,9 @@ app.post('/logout', (req, res) => {
 
 // redirects a short url to its real url
 app.get('/u/:shortURL', (req, res) => {
+  req.session.visitor_id = (req.session.visitor_id || generateRandomString(10));
   const longURL = url_db[req.params.shortURL].longURL;
+  url_db[req.params.shortURL].accessLog.push(req.session.visitor_id);
   res.redirect(longURL);
 });
 
