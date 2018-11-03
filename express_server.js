@@ -39,7 +39,14 @@ function urlsForUser(userID) {
 }
 
 // create init databases with some default values
-const url_db = { ea29ps: { creator: '1p5whfmt', longURL: 'http://festivalworlds.com', accessLog: ['me, once'] } };
+const url_db = { 
+  ea29ps: { 
+    creator: '1p5whfmt', 
+    longURL: 'http://festivalworlds.com', 
+    accessLog: [{id: 'me, once', timestamp: '8oClock'}], 
+    uniqueAccessLog: [{id: 'me, once', timestamp: '8oClock'}],
+    } 
+  };
 const users = { '1p5whfmt': { id: '1p5whfmt', email: 'a@a', hashedPassword: /* 'a' */ '$2b$10$fmZojVzHnrdMlMwdhSP7uOKd/kYllv9G3xxzqH.Iym8QZpi14BKvK' } };
 
 // home route
@@ -147,6 +154,7 @@ app.post('/urls/new', (req, res) => {
     longURL: longURL,
     timeCreated: date.getTime(),
     accessLog: [],
+    uniqueAccessLog: []
   };
   res.redirect('/urls');
 });
@@ -184,7 +192,12 @@ app.post('/logout', (req, res) => {
 app.get('/u/:shortURL', (req, res) => {
   req.session.visitor_id = (req.session.visitor_id || generateRandomString(10));
   const longURL = url_db[req.params.shortURL].longURL;
-  url_db[req.params.shortURL].accessLog.push(req.session.visitor_id);
+  //logs every click to Access log
+  url_db[req.params.shortURL].accessLog.push({id: req.session.visitor_id, timestamp: date.getTime()});
+  //logs unique clicks to uniqueAccessLog if 
+  if (url_db[req.params.shortURL].uniqueAccessLog.indexOf(req.session.visitor_id) === -1) {
+    url_db[req.params.shortURL].uniqueAccessLog.push({id: req.session.visitor_id, timestamp: date.getTime()});
+  } 
   res.redirect(longURL);
 });
 
