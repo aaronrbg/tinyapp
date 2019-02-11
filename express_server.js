@@ -7,8 +7,8 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-const cookieSession = require('cookie-session')
-;
+const cookieSession = require('cookie-session');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
@@ -39,7 +39,14 @@ function urlsForUser(userID) {
 }
 
 // create init databases with some default values
-const url_db = { ea29ps: { creator: '1p5whfmt', longURL: 'http://festivalworlds.com' } };
+const url_db = { 
+  ea29ps: { 
+    creator: '1p5whfmt', 
+    longURL: 'http://festivalworlds.com', 
+    accessLog: [{id: 'me, once', timestamp: '8oClock'}], 
+    uniqueAccessLog: [{id: 'me, once', timestamp: '8oClock'}],
+    } 
+  };
 const users = { '1p5whfmt': { id: '1p5whfmt', email: 'a@a', hashedPassword: /* 'a' */ '$2b$10$fmZojVzHnrdMlMwdhSP7uOKd/kYllv9G3xxzqH.Iym8QZpi14BKvK' } };
 
 // home route
@@ -83,6 +90,7 @@ app.post('/login', (req, res) => {
 app.get('/urls', (req, res) => {
   const templateVars = {
     // calls helper function to serve filtered db
+    url_db,
     urls: urlsForUser(req.session.user_id),
     user: req.session.user_id,
   };
@@ -144,6 +152,9 @@ app.post('/urls/new', (req, res) => {
   url_db[shortURL] = {
     creator: user,
     longURL: longURL,
+    timeCreated: date.getTime(),
+    accessLog: [],
+    uniqueAccessLog: []
   };
   res.redirect('/urls');
 });
@@ -160,6 +171,7 @@ app.get('/urls/:id', (req, res) => {
     const templateVars = {
       shortURL: req.params.id,
       urls: urlsForUser(req.session.user_id),
+      url_db,
       user: req.session.user_id,
     };
     res.render('urls_show', templateVars);
@@ -178,7 +190,14 @@ app.post('/logout', (req, res) => {
 
 // redirects a short url to its real url
 app.get('/u/:shortURL', (req, res) => {
+  req.session.visitor_id = (req.session.visitor_id || generateRandomString(10));
   const longURL = url_db[req.params.shortURL].longURL;
+  //logs every click to Access log
+  url_db[req.params.shortURL].accessLog.push({id: req.session.visitor_id, timestamp: date.getTime()});
+  //logs unique clicks to uniqueAccessLog if 
+  if (url_db[req.params.shortURL].uniqueAccessLog.indexOf(req.session.visitor_id) === -1) {
+    url_db[req.params.shortURL].uniqueAccessLog.push({id: req.session.visitor_id, timestamp: date.getTime()});
+  } 
   res.redirect(longURL);
 });
 

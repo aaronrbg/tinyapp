@@ -9,7 +9,7 @@
       <h2>URLs:</h2>
       <ul>
       <% for(let url in urls){ %>
-        <li><p><a href="<%=`/u/${url}`%>"><%= `${url}`%></a> &#160; &#160; &#160;<%= urls[url] %><form method="POST" action="/urls/<%=`${url}`%>/delete"><button>Delete</button></form><a href="/urls/<%=[url]%>"><button>Edit</button></a></p></li>
+        <li><p><a href="<%=`/u/${url}`%>"><%= `${url}`%></a>&#160; &#160; &#160;<%= urls[url] %>&#160; &#160;<%=`${url_db[url].accessLog.length} views`%><form method="POST" action="/urls/<%=`${url}`%>/delete"><button>Delete</button></form><a href="/urls/<%=[url]%>"><button>Edit</button></a></p></li>
       <% } %>
       </ul>
       </br>

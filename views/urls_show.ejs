@@ -8,6 +8,7 @@
     <% for(let url in urls){ %>
         <% if(url === shortURL){ %>
             <h1><%=`${url}`%></h1>
+            <h3><%=`${url_db[url].accessLog.length} views`%>&#160; &#160;<%=`${url_db[url].uniqueAccessLog.length} unique views`%></h3>
             <form method="POST" action=<%=`/urls/${shortURL}`%>>
                 <input type="text" id="newURL" name="newURL" placeholder= "<%=urls[url]%>" value="" /><br />
                 <button type="submit">Update</button>
